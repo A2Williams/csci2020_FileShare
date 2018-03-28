@@ -22,6 +22,10 @@ public class FileClient extends Application {
             String path = params.get(1);
             if (new File(path).isDirectory()) {
                 controller.setParams(host, path);
+                controller.showClientFldr();
+                primaryStage.setTitle("File Sharer");
+                primaryStage.setScene(new Scene(root, 600, 800));
+                primaryStage.show();
             } else {
                 System.err.println("ERROR: No such directory exists!");
                 System.exit(-1);
@@ -29,9 +33,6 @@ public class FileClient extends Application {
         } catch (Exception e) {
             System.err.println("ERROR: parameters not correct");
         }
-        primaryStage.setTitle("File Sharer");
-        primaryStage.setScene(new Scene(root, 600, 800));
-        primaryStage.show();
     }
 
     public static void main(String[] args) {

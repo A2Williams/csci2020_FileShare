@@ -1,11 +1,10 @@
 package sample;
 import java.io.*;
 import java.net.*;
-import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
 
 public class ClientConnectionHandler extends Thread {
-    boolean DEBUG = true;
+    private boolean DEBUG = true;
     private Socket socket = null;
     private BufferedReader input = null;
     private PrintWriter responseOut = null;

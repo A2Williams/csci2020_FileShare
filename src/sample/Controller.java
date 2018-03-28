@@ -11,7 +11,7 @@ import java.net.Socket;
 import java.util.StringTokenizer;
 
 public class Controller {
-    boolean DEBUG = true;
+    private boolean DEBUG = true;
 
     @FXML private ListView<String> localFiles;
     @FXML private ListView<String> serverFiles;
@@ -20,17 +20,18 @@ public class Controller {
     private Socket socket = null;
     private PrintWriter toServer;
     private BufferedReader fromServer;
-    private static String hostName;
+    private String hostName;
     private String path;
     private static int serverPort = 49000;
 
     public void setParams(String hostName, String path) {
         this.hostName = hostName;
         this.path = path;
+        if (DEBUG) System.out.printf("host: %s\t path: %s", hostName,path);
     }
 
     @FXML public void initialize() {
-        //TODO: populate server and client files from shared folders
+        // show local folder
         // open a socket to get server file names
         try {
             socket = new Socket(hostName, serverPort);
@@ -55,7 +56,6 @@ public class Controller {
                     System.err.println("ERROR: no input to parse!");
                 }
             }
-            //showClientFldr();
             try {
                 toServer.close();
                 fromServer.close();
@@ -76,11 +76,23 @@ public class Controller {
         server = FXCollections.observableArrayList();
         StringTokenizer tokenizer = new StringTokenizer(fileToken);
 
-        // add file names to an observable list
+        // add file names to server observable list
         while (tokenizer.hasMoreTokens()) {
             server.add(tokenizer.nextToken());
         }
         // show in listView
         serverFiles.setItems(server);
+    }
+
+    public void showClientFldr() {
+        local = FXCollections.observableArrayList();
+        // navigate to path folder
+        File[] files = new File(path).listFiles();
+
+        // add file names to observable list
+        for (File file : files) {
+            local.add(file.getName());
+        }
+        localFiles.setItems(local);
     }
 }
