@@ -6,14 +6,13 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-import java.io.IOException;
 import java.util.List;
 
 public class FileClient extends Application {
-    protected List<String> params = this.getParameters().getRaw();
 
     @Override
     public void start(Stage primaryStage) throws Exception{
+        List<String> params = this.getParameters().getRaw();
         FXMLLoader loader = new FXMLLoader(getClass().getResource("sample.fxml"));
         Parent root = loader.load();
         Controller controller = loader.getController();

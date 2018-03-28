@@ -1,14 +1,16 @@
 package sample;
 import java.io.*;
 import java.net.*;
+import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
 
 public class ClientConnectionHandler extends Thread {
+    boolean DEBUG = true;
     private Socket socket = null;
     private BufferedReader input = null;
     private PrintWriter responseOut = null;
     private String serverDirPath = null;
-    private String clientDirPath = null;
+
     public ClientConnectionHandler(Socket socket, String path) {
         super();
         this.socket = socket;
@@ -16,9 +18,9 @@ public class ClientConnectionHandler extends Thread {
 
         try {
             input = new BufferedReader(
-                    new InputStreamReader(socket.getInputStream()));
+                    new InputStreamReader(this.socket.getInputStream()));
             responseOut = new PrintWriter(
-                    socket.getOutputStream(),true);
+                    this.socket.getOutputStream(),true);
         } catch (IOException e) {
             System.err.println("ERROR: " +
                     "IOException while initiating read/write connection");
@@ -30,8 +32,8 @@ public class ClientConnectionHandler extends Thread {
         String request = null;
 
         try {
-            clientDirPath = input.readLine();
             request = input.readLine();
+            if (DEBUG) System.out.println("Received " + request);
             getRequest(request);
         } catch (IOException e) {
             e.printStackTrace();
@@ -40,6 +42,7 @@ public class ClientConnectionHandler extends Thread {
                 input.close();
                 responseOut.close();
                 socket.close();
+                if (DEBUG) System.out.print("closed Successfully");
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -50,14 +53,16 @@ public class ClientConnectionHandler extends Thread {
         // split up string to get request
         StringTokenizer tokenizer = new StringTokenizer(req);
         String command = tokenizer.nextToken();
-        String fileName = tokenizer.nextToken();
+        String fileName = "";
         if (command.equals("DIR")) {
             handleDIR();
         }
         else if (command.equals("UPLOAD")) {
+            fileName = tokenizer.nextToken();
             handleUP(fileName);
         }
         else {
+            fileName = tokenizer.nextToken();
             handleDOWN(fileName);
         }
     }
@@ -69,8 +74,10 @@ public class ClientConnectionHandler extends Thread {
         for (File f: serverFiles) {
             fileNames += f.getName() + " ";
         }
-        responseOut.write(fileNames);
+        if (DEBUG) System.out.println("Sending files: " + fileNames);
+        responseOut.println(fileNames);
     }
+
 
     private void handleUP(String filename) {
         // upload file from client to server
