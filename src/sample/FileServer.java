@@ -5,13 +5,13 @@ import java.net.*;
 
 public class FileServer {
     private ServerSocket serverSocket = null;
-    private File dir = null;
+    private String dir = null;
 
     public FileServer(int port, String dir) throws IOException {
         // initializes server socket connection and sharing directory
         // throws @ socket initialization
         if (new File(dir).isDirectory()) {
-            this.dir = new File(dir);
+            this.dir = dir;
             serverSocket = new ServerSocket(port);
             System.out.println("Server initialized on port!");
         } else {
@@ -26,7 +26,7 @@ public class FileServer {
             Socket clientSocket = serverSocket.accept();
             ClientConnectionHandler handler =
                     new ClientConnectionHandler(
-                            clientSocket, dir.getPath());
+                            clientSocket, dir);
             handler.start();
         }
     }
