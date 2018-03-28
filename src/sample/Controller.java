@@ -2,11 +2,10 @@ package sample;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 
-import java.awt.event.ActionEvent;
 import java.io.*;
 import java.net.Socket;
 import java.util.StringTokenizer;
@@ -66,10 +65,10 @@ public class Controller {
             }
         }
     }
-    @FXML public void getFile(ActionEvent e) {
+    public void getFile(ActionEvent e) {
         //TODO: Download button obtains file for client from server
     }
-    @FXML public void sendFile(ActionEvent e) {
+    public void sendFile(ActionEvent e) {
         //TODO: Upload button sends file from client to server
     }
 
