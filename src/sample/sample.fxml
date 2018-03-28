@@ -1,8 +1,29 @@
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.layout.GridPane?>
-
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<GridPane fx:controller="sample.Controller"
-          xmlns:fx="http://javafx.com/fxml" alignment="center" hgap="10" vgap="10">
-</GridPane>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+
+<BorderPane fx:controller="sample.Controller"
+            xmlns:fx="http://javafx.com/fxml">
+    <top>
+        <HBox>
+            <Button onAction="#getFile"
+                    text="Download" />
+            <Button onAction="#sendFile"
+                    text="Upload" />
+        </HBox>
+    </top>
+    <center>
+        <GridPane hgap="10">
+            <ListView fx:id="localFiles"
+                      prefWidth="295"
+                      prefHeight="650"
+                      GridPane.columnIndex="0"/>
+            <ListView fx:id="serverFiles"
+                      prefWidth="295"
+                      prefHeight="650"
+                      GridPane.columnIndex="1"/>
+        </GridPane>
+    </center>
+</BorderPane>
