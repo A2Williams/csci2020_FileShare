@@ -6,6 +6,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+import java.io.File;
 import java.util.List;
 
 public class FileClient extends Application {
@@ -19,7 +20,12 @@ public class FileClient extends Application {
         try {
             String host = params.get(0);
             String path = params.get(1);
-            controller.setParams(host, path);
+            if (new File(path).isDirectory()) {
+                controller.setParams(host, path);
+            } else {
+                System.err.println("ERROR: No such directory exists!");
+                System.exit(-1);
+            }
         } catch (Exception e) {
             System.err.println("ERROR: parameters not correct");
         }
