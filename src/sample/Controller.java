@@ -6,14 +6,14 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 
+import java.awt.event.ActionEvent;
 import java.io.*;
 import java.net.Socket;
 import java.util.StringTokenizer;
 
 public class Controller {
     boolean DEBUG = true;
-    @FXML private Button download;
-    @FXML private Button upload;
+
     @FXML private ListView<String> localFiles;
     @FXML private ListView<String> serverFiles;
     private ObservableList<String> server, local;
@@ -66,10 +66,10 @@ public class Controller {
             }
         }
     }
-    @FXML public void getFile() {
+    @FXML public void getFile(ActionEvent e) {
         //TODO: Download button obtains file for client from server
     }
-    @FXML public void sendFile() {
+    @FXML public void sendFile(ActionEvent e) {
         //TODO: Upload button sends file from client to server
     }
 
