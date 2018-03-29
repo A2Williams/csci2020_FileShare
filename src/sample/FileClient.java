@@ -14,12 +14,14 @@ public class FileClient extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception{
         List<String> params = this.getParameters().getRaw();
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("sample.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("fileUI.fxml"));
         Parent root = loader.load();
         Controller controller = loader.getController();
+        // pass command line arguments to the controller
         try {
             String host = params.get(0);
             String path = params.get(1);
+            // check if the shared file exists
             if (new File(path).isDirectory()) {
                 controller.setParams(host, path);
                 controller.showClientFldr();

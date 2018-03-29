@@ -4,7 +4,7 @@ import java.net.*;
 import java.util.StringTokenizer;
 
 public class ClientConnectionHandler extends Thread {
-    private boolean DEBUG = true;
+    private boolean DEBUG = false;
     private Socket socket = null;
     private BufferedReader input = null;
     private PrintWriter responseOut = null;

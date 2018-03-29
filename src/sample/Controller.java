@@ -1,21 +1,17 @@
 package sample;
 
-import javafx.application.Preloader;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListView;
 
-import javax.swing.*;
 import java.io.*;
 import java.net.Socket;
 import java.util.StringTokenizer;
 
 public class Controller {
-    private boolean DEBUG = true;
+    private boolean DEBUG = false;
 
     @FXML private ListView<String> localFiles;
     @FXML private ListView<String> serverFiles;
@@ -110,7 +106,7 @@ public class Controller {
         }
     }
     private void openSocket() {
-        // open a socket
+        // opens a socket and file streams
         try {
             socket = new Socket(hostName, serverPort);
         } catch (IOException e) {
@@ -128,6 +124,7 @@ public class Controller {
         }
     }
     private void close() {
+        // closes socket and open streams
         try {
             toServer.close();
             fromServer.close();
