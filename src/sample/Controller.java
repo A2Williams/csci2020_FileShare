@@ -35,22 +35,8 @@ public class Controller {
         if (DEBUG) System.out.printf("host: %s\t path: %s\n",
                 hostName,path);
     }
-
     @FXML public void initialize() {
-        // show local folder
-        openSocket();
-        if (null != socket) {
-            if (null != toServer) {
-                if (DEBUG) System.out.println("Sending DIR command");
-                toServer.println("DIR");
-                try {
-                    showServerFldr(fromServer.readLine());
-                } catch (IOException e) {
-                    System.err.println("ERROR: no input to parse!");
-                }
-            }
-            close();
-        }
+        getServerFldr();
     }
     public void getFile(ActionEvent event) {
         // check if file  on server side is selected
@@ -83,7 +69,45 @@ public class Controller {
         showClientFldr();
     }
     public void sendFile(ActionEvent event) {
-
+        if (null == clientFile) {
+            System.err.println("ERROR: No file selected.");
+        } else {
+            openSocket();
+            if (null != socket) {
+                if (null != toServer) {
+                    // send download request
+                    if (DEBUG) System.out.println("Sending UPLOAD command");
+                    toServer.println("UPLOAD " + clientFile);
+                    // get socket output into a file
+                    try {
+                        if (DEBUG) System.out.println(path + clientFile);
+                        BufferedReader readFile = new BufferedReader(new FileReader(
+                                new File(path + clientFile)));
+                        String buffer = null;
+                        // read from file and write to socket
+                        try {
+                            buffer = readFile.readLine();
+                        } catch (IOException e) {
+                            System.err.println("ERROR: " +
+                                    "IOException trying to read file");
+                        }
+                        while (null != buffer) {
+                            toServer.println(buffer);
+                            try {
+                                buffer = readFile.readLine();
+                            } catch (IOException e) {
+                                System.err.println("ERROR: " +
+                                        "IOException trying to read file");
+                            }
+                        }
+                    } catch (FileNotFoundException e) {
+                        System.err.println("ERROR: " + clientFile+ "does not exist?");
+                    }
+                }
+            }
+            close();
+            getServerFldr();
+        }
     }
     private void openSocket() {
         // open a socket
@@ -110,6 +134,22 @@ public class Controller {
             socket.close();
         } catch (IOException e) {
             System.err.println("ERROR: cannot close connection");
+        }
+    }
+    private void getServerFldr() {
+        // show local folder
+        openSocket();
+        if (null != socket) {
+            if (null != toServer) {
+                if (DEBUG) System.out.println("Sending DIR command");
+                toServer.println("DIR");
+                try {
+                    showServerFldr(fromServer.readLine());
+                } catch (IOException e) {
+                    System.err.println("ERROR: no input to parse!");
+                }
+            }
+            close();
         }
     }
     private void showServerFldr(String fileToken) {

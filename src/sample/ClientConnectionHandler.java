@@ -26,7 +26,6 @@ public class ClientConnectionHandler extends Thread {
             e.printStackTrace();
         }
     }
-
     public void run() {
         String request = null;
 
@@ -47,7 +46,6 @@ public class ClientConnectionHandler extends Thread {
             }
         }
     }
-
     private void getRequest(String req) {
         // split up string to get request
         StringTokenizer tokenizer = new StringTokenizer(req);
@@ -76,12 +74,21 @@ public class ClientConnectionHandler extends Thread {
         if (DEBUG) System.out.println("Sending files: " + fileNames);
         responseOut.println(fileNames);
     }
-
-
     private void handleUP(String filename) {
         // upload file from client to server
+        try {
+            PrintWriter writer = new PrintWriter(serverDirPath + filename);
+            String buffer = input.readLine();
+            while (null != buffer) {
+                writer.println(buffer);
+                buffer = input.readLine();
+            }
+            System.out.println("UPLOAD Complete");
+            writer.close();
+        } catch (IOException e) {
+            System.err.println("ERROR: cannot upload file");
+        }
     }
-
     private void handleDOWN(String filename) {
         // open file reader for server file
         try {
