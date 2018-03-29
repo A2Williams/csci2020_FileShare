@@ -41,7 +41,7 @@ public class ClientConnectionHandler extends Thread {
                 input.close();
                 responseOut.close();
                 socket.close();
-                if (DEBUG) System.out.print("closed Successfully");
+                if (DEBUG) System.out.println("closed Successfully");
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -83,6 +83,30 @@ public class ClientConnectionHandler extends Thread {
     }
 
     private void handleDOWN(String filename) {
-        // client downloads file from server
+        // open file reader for server file
+        try {
+            if (DEBUG) System.out.println(serverDirPath + filename);
+            BufferedReader readFile = new BufferedReader(new FileReader(
+                    new File(serverDirPath + filename)));
+            String buffer = null;
+            // read from file and write to socket
+            try {
+                buffer = readFile.readLine();
+            } catch (IOException e) {
+                System.err.println("ERROR: " +
+                        "IOException trying to read file");
+            }
+            while (null != buffer) {
+                responseOut.println(buffer);
+                try {
+                    buffer = readFile.readLine();
+                } catch (IOException e) {
+                    System.err.println("ERROR: " +
+                            "IOException trying to read file");
+                }
+            }
+        } catch (FileNotFoundException e) {
+            System.err.println("ERROR: " + filename+ "does not exist?");
+        }
     }
 }

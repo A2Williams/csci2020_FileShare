@@ -1,11 +1,15 @@
 package sample;
 
+import javafx.application.Preloader;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListView;
 
+import javax.swing.*;
 import java.io.*;
 import java.net.Socket;
 import java.util.StringTokenizer;
@@ -15,7 +19,8 @@ public class Controller {
 
     @FXML private ListView<String> localFiles;
     @FXML private ListView<String> serverFiles;
-    private ObservableList<String> server, local;
+    private String clientFile = "";
+    private String serverFile = "";
 
     private Socket socket = null;
     private PrintWriter toServer;
@@ -27,26 +32,14 @@ public class Controller {
     public void setParams(String hostName, String path) {
         this.hostName = hostName;
         this.path = path;
-        if (DEBUG) System.out.printf("host: %s\t path: %s", hostName,path);
+        if (DEBUG) System.out.printf("host: %s\t path: %s\n",
+                hostName,path);
     }
 
     @FXML public void initialize() {
         // show local folder
-        // open a socket to get server file names
-        try {
-            socket = new Socket(hostName, serverPort);
-        } catch (IOException e) {
-            System.err.println("ERROR: initializing connection to server");
-        }
+        openSocket();
         if (null != socket) {
-            try {
-                 toServer = new PrintWriter(
-                        socket.getOutputStream(),true);
-                 fromServer = new BufferedReader(
-                        new InputStreamReader(socket.getInputStream()));
-            } catch (IOException e) {
-                System.err.println("ERROR: opening output stream");
-            }
             if (null != toServer) {
                 if (DEBUG) System.out.println("Sending DIR command");
                 toServer.println("DIR");
@@ -56,24 +49,71 @@ public class Controller {
                     System.err.println("ERROR: no input to parse!");
                 }
             }
+            close();
+        }
+    }
+    public void getFile(ActionEvent event) {
+        // check if file  on server side is selected
+        if (null == serverFile) {
+            System.err.println("ERROR: No file selected.");
+        } else {
+            openSocket();
+            if (null != socket) {
+                if (null != toServer) {
+                    // send download request
+                    if (DEBUG) System.out.println("Sending DOWNLOAD command");
+                    toServer.println("DOWNLOAD " + serverFile);
+                    // get socket output into a file
+                    try {
+                        PrintWriter writer = new PrintWriter(path + serverFile);
+                        String buffer = fromServer.readLine();
+                        while (null != buffer) {
+                            writer.println(buffer);
+                            buffer = fromServer.readLine();
+                        }
+                        System.out.println("DOWNLOAD Complete");
+                        writer.close();
+                    } catch (IOException e) {
+                        System.err.println("ERROR: cannot download file");
+                    }
+                }
+            }
+            close();
+        }
+        showClientFldr();
+    }
+    public void sendFile(ActionEvent event) {
+
+    }
+    private void openSocket() {
+        // open a socket
+        try {
+            socket = new Socket(hostName, serverPort);
+        } catch (IOException e) {
+            System.err.println("ERROR: initializing connection to server");
+        }
+        if (null != socket) {
             try {
-                toServer.close();
-                fromServer.close();
-                socket.close();
+                toServer = new PrintWriter(
+                        socket.getOutputStream(), true);
+                fromServer = new BufferedReader(
+                        new InputStreamReader(socket.getInputStream()));
             } catch (IOException e) {
-                System.err.println("ERROR: cannot close connection");
+                System.err.println("ERROR: opening output stream");
             }
         }
     }
-    public void getFile(ActionEvent e) {
-        //TODO: Download button obtains file for client from server
+    private void close() {
+        try {
+            toServer.close();
+            fromServer.close();
+            socket.close();
+        } catch (IOException e) {
+            System.err.println("ERROR: cannot close connection");
+        }
     }
-    public void sendFile(ActionEvent e) {
-        //TODO: Upload button sends file from client to server
-    }
-
     private void showServerFldr(String fileToken) {
-        server = FXCollections.observableArrayList();
+        ObservableList<String> server = FXCollections.observableArrayList();
         StringTokenizer tokenizer = new StringTokenizer(fileToken);
 
         // add file names to server observable list
@@ -82,10 +122,15 @@ public class Controller {
         }
         // show in listView
         serverFiles.setItems(server);
+        serverFiles.getSelectionModel().selectedItemProperty().addListener(
+                (observable, oldValue, newValue) -> {
+                    if (DEBUG) System.out.println("Selected: " + newValue);
+                    serverFile = newValue;
+                }
+        );
     }
-
     public void showClientFldr() {
-        local = FXCollections.observableArrayList();
+        ObservableList<String> local = FXCollections.observableArrayList();
         // navigate to path folder
         File[] files = new File(path).listFiles();
 
@@ -94,5 +139,11 @@ public class Controller {
             local.add(file.getName());
         }
         localFiles.setItems(local);
+        localFiles.getSelectionModel().selectedItemProperty().addListener(
+                (observable, oldValue, newValue) -> {
+                    if (DEBUG) System.out.println("Selected: " + newValue);
+                    clientFile = newValue;
+                }
+        );
     }
 }
